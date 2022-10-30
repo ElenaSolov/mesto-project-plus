@@ -16,7 +16,6 @@ import User from '../models/user';
 // };
 
 const createUser = async (req: Request, res: Response) => {
-  console.log(req.body);
   await User.create({
     name: req.body.name,
     about: req.body.about,
