@@ -40,7 +40,7 @@ export const likeCard = async (req:Request, res: Response) => {
     { new: true },
   )
     // @ts-ignore
-    .then((card) => res.status(201).send({ name: card.name, link: card.link, likes: card.likes }))
+    .then((card) => res.status(200).send({ name: card.name, link: card.link, likes: card.likes }))
     .catch((err) => res.status(400).send(err));
 };
 
@@ -51,5 +51,5 @@ export const dislikeCard = async (req:Request, res: Response) => Card.findByIdAn
   { new: true },
 )
   // @ts-ignore
-  .then((card) => res.status(201).send({ name: card.name, link: card.link, likes: card.likes }))
+  .then((card) => res.status(200).send({ name: card.name, link: card.link, likes: card.likes }))
   .catch((err) => res.status(400).send(err));
