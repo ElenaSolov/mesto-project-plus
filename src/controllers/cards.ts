@@ -30,3 +30,26 @@ export const deleteCard = async (req:Request, res: Response) => {
     .then(() => res.status(204).send())
     .catch((err) => res.status(400).send(err));
 };
+
+export const likeCard = async (req:Request, res: Response) => {
+  const { cardId } = req.params;
+  await Card.findByIdAndUpdate(
+    cardId,
+    // @ts-ignore
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  )
+    // @ts-ignore
+    .then((card) => res.status(201).send({ name: card.name, link: card.link, likes: card.likes }))
+    .catch((err) => res.status(400).send(err));
+};
+
+export const dislikeCard = async (req:Request, res: Response) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  // @ts-ignore
+  { $pull: { likes: req.user._id } }, // убрать _id из массива
+  { new: true },
+)
+  // @ts-ignore
+  .then((card) => res.status(201).send({ name: card.name, link: card.link, likes: card.likes }))
+  .catch((err) => res.status(400).send(err));
