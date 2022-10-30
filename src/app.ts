@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users';
+import cardsRouter from './routes/cards';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -17,9 +18,20 @@ run().then(() => app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 }))
   .catch((err) => console.log(err));
-app.use(express.json());
 
+app.use((req, res, next) => {
+  // @ts-ignore
+  req.user = {
+    _id: '635e64d7e2b2841dd47bdf1c',
+  };
+
+  next();
+});
+app.use(express.json());
 app.use('/', usersRouter);
+
+app.use('/', cardsRouter);
+
 app.get('/', (req, res) => {
   res.status(200).send('Mesto App');
 });

@@ -1,12 +1,9 @@
-import { Router, Request, Response } from 'express';
-import Card from '../models/card';
+import { Router } from 'express';
+import { getCards, deleteCard, createCard } from '../controllers/cards';
 
 const router = Router();
 
-router.get('/cards', async (req: Request, res: Response) => {
-
-});
-
+router.get('/cards', getCards);
 router.post('/cards', createCard);
 router.delete('/cards/:id', deleteCard);
 
