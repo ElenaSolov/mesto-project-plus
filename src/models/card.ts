@@ -1,9 +1,9 @@
-import mongoose, { Schema, Date } from 'mongoose';
+import mongoose, { Schema, Date, Types } from 'mongoose';
 
 export interface ICard {
   name: string;
   link: string;
-  owner: string;
+  owner: Types.ObjectId;
   likes: [];
   createdAt: Date
 }
