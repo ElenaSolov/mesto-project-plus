@@ -1,13 +1,13 @@
 import mongoose, { Schema, Date } from 'mongoose';
 
-export interface Icard {
+export interface ICard {
   name: string;
   link: string;
   owner: string;
   likes: [];
   createdAt: Date
 }
-const cardSchema = new Schema({
+const cardSchema = new Schema<ICard>({
   name: {
     type: String,
     required: true,
@@ -32,4 +32,4 @@ const cardSchema = new Schema({
   },
 });
 
-export default mongoose.model<Icard>('card', cardSchema);
+export default mongoose.model<ICard>('card', cardSchema);

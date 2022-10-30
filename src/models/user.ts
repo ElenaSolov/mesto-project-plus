@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 export interface IUser {
   name: string;
   about: string;
   avatar: string;
 }
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
     required: true,
