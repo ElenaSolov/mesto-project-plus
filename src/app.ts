@@ -1,12 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
 
-// Слушаем 3000 порт
-const { PORT = 4000 } = process.env;
-const uri = 'mongodb+srv://seaver:50f6Y2YYrbkmpQcj@cluster0.qf2ysmc.mongodb.net/?retryWrites=true&w=majority';
+const { PORT = 3000 } = process.env;
 const app = express();
 mongoose
-  .connect(uri)
+  .connect('mongodb://localhost:27017/mestodb ')
   .then(() => app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
   }))

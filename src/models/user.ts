@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 
+export interface IUser {
+  name: string;
+  about: string;
+  avatar: string;
+}
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -7,20 +12,16 @@ const userSchema = new mongoose.Schema({
     minLength: 2,
     maxLength: 30,
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
   about: {
     type: String,
     required: true,
-    minLength: 2
+    minLength: 2,
+    maxLength: 200,
   },
-  password: {
+  avatar: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-export default mongoose.model('user', userSchema);
+export default mongoose.model<IUser>('user', userSchema);
