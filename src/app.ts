@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
-import { uri } from './constants';
+import { uri, STATUS_200 } from './constants';
 import addUserToRequest from './middleware/addUserToRequest';
 
 const { PORT = 3000 } = process.env;
@@ -22,5 +22,5 @@ app.use('/', usersRouter);
 app.use('/', cardsRouter);
 
 app.get('/', (req, res) => {
-  res.status(200).send('Mesto App');
+  res.status(STATUS_200).send('Mesto App');
 });
