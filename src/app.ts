@@ -2,10 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
-import { uri, STATUS_200 } from './constants';
+import { uri, DEFAULT_PORT, STATUS_200 } from './constants';
 import addUserToRequest from './middleware/addUserToRequest';
+import handleServerErrors from './middleware/handleServerErrors';
 
-const { PORT = 3000 } = process.env;
+const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
 
 async function run() {
@@ -20,6 +21,7 @@ app.use('/', addUserToRequest);
 app.use(express.json());
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
+app.use('/', handleServerErrors);
 
 app.get('/', (req, res) => {
   res.status(STATUS_200).send('Mesto App');
