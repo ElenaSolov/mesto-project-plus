@@ -16,7 +16,7 @@ export const createCard = async (req: Request, res: Response) => {
   const owner = await User.findById(userId);
   const { name, link } = req.body;
   if (!name || !link) {
-    res.status(400).send('Name and link should be provided for new card');
+    res.status(400).send({ message: 'Name and link should be provided for new card' });
     return;
   }
   await Card.create({
@@ -32,7 +32,7 @@ export const deleteCard = async (req:Request, res: Response) => {
   const { id } = req.params;
   await Card.findByIdAndRemove(id)
     .then(() => res.status(204).send())
-    .catch((err) => res.status(400).send(err));
+    .catch(() => res.status(400).send({ message: 'Карточка не найдена' }));
 };
 
 export const likeCard = async (req:Request, res: Response) => {
@@ -45,15 +45,15 @@ export const likeCard = async (req:Request, res: Response) => {
   )
     // @ts-ignore
     .then((card) => res.status(200).send({ name: card.name, link: card.link, likes: card.likes }))
-    .catch((err) => res.status(400).send(err));
+    .catch(() => res.status(400).send({ message: 'Карточка не найдена' }));
 };
 
 export const dislikeCard = async (req:Request, res: Response) => Card.findByIdAndUpdate(
   req.params.cardId,
   // @ts-ignore
-  { $pull: { likes: req.user._id } }, // убрать _id из массива
+  { $pull: { likes: req.user._id } },
   { new: true },
 )
   // @ts-ignore
   .then((card) => res.status(200).send({ name: card.name, link: card.link, likes: card.likes }))
-  .catch((err) => res.status(400).send(err));
+  .catch(() => res.status(400).send({ message: 'Карточка не найдена' }));
