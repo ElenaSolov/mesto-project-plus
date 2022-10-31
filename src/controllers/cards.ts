@@ -7,17 +7,21 @@ export const getCards = async (req: Request, res: Response) => {
     .then((cards) => {
       res.status(200).send(cards);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(400).send(err));
 };
 
 export const createCard = async (req: Request, res: Response) => {
-  console.log(req.body);
   // @ts-ignore
   const userId = req.user._id;
   const owner = await User.findById(userId);
+  const { name, link } = req.body;
+  if (!name || !link) {
+    res.status(400).send('Name and link should be provided for new card');
+    return;
+  }
   await Card.create({
-    name: req.body.name,
-    link: req.body.link,
+    name,
+    link,
     owner,
   })
     .then((card) => res.status(201).send({ name: card.name, link: card.link }))
