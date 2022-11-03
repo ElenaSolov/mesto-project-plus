@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import User from '../models/user';
-import { STATUS_200, STATUS_400, STATUS_404 } from '../constants';
+import {
+  STATUS_200, STATUS_400, STATUS_500, STATUS_404,
+} from '../constants';
 
 export const getUsers = async (req: Request, res: Response) => {
   await User.find({})
     .then((users) => {
       res.status(STATUS_200).send(users);
     })
-    .catch((err) => res.status(STATUS_400).send(err));
+    .catch((err) => res.status(STATUS_500).send(err));
 };
 
 export const createUser = async (req: Request, res: Response) => {
@@ -25,14 +27,21 @@ export const createUser = async (req: Request, res: Response) => {
     .catch((err) => res.status(STATUS_400).send(err));
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = (req: Request, res: Response) => {
   const { id } = req.params;
-  await User.findById(id).exec()
-    .then((user) => res.status(STATUS_200).send(user))
-    .catch(() => res.status(STATUS_404).send({ message: 'Пользователь не найден' }));
+  console.log(id);
+  User.findUserById(id).then((user) => res.send(user))
+    .catch((err) => {
+      if (err === 'Пользователя с таким id не существует') {
+        res.status(STATUS_404).send({ message: err });
+      } else {
+        res.status(STATUS_500).send({ message: 'Ошибка сервера' });
+      }
+    });
 };
 
 export const updateUserProfile = async (req: Request, res: Response) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const id = req.user._id;
   const { name, about } = req.body;
@@ -51,6 +60,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 export const updateUserAvatar = async (req: Request, res: Response) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const id = req.user._id;
   const { avatar } = req.body;

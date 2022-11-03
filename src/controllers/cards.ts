@@ -12,6 +12,7 @@ export const getCards = async (req: Request, res: Response) => {
 };
 
 export const createCard = async (req: Request, res: Response) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const userId = req.user._id;
   const owner = await User.findById(userId);
@@ -40,11 +41,13 @@ export const likeCard = async (req:Request, res: Response) => {
   const { cardId } = req.params;
   await Card.findByIdAndUpdate(
     cardId,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
     .then((card) => res.status(STATUS_200)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       .send({ name: card.name, link: card.link, likes: card.likes }))
     .catch(() => res.status(STATUS_400).send({ message: 'Карточка не найдена' }));
@@ -52,11 +55,13 @@ export const likeCard = async (req:Request, res: Response) => {
 
 export const dislikeCard = async (req:Request, res: Response) => Card.findByIdAndUpdate(
   req.params.cardId,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   { $pull: { likes: req.user._id } },
   { new: true },
 )
   .then((card) => res.status(STATUS_200)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     .send({ name: card.name, link: card.link, likes: card.likes }))
   .catch(() => res.status(STATUS_400).send({ message: 'Карточка не найдена' }));

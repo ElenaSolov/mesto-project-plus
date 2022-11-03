@@ -5,7 +5,11 @@ export interface IUser {
   about: string;
   avatar: string;
 }
-const userSchema = new Schema<IUser>({
+interface IUserModel extends mongoose.Model<IUser> {
+  findUserById: (id: string) => Promise<mongoose.Document<unknown, never, IUser>>
+}
+
+const userSchema = new Schema<IUser, IUserModel>({
   name: {
     type: String,
     required: true,
@@ -23,5 +27,11 @@ const userSchema = new Schema<IUser>({
     required: true,
   },
 });
+userSchema.static('findUserById', function findUserById(id: string) {
+  return this.findOne({ _id: id }) // this — это модель User
+    .then((user) => user)
+    // eslint-disable-next-line prefer-promise-reject-errors
+    .catch(() => Promise.reject('Пользователя с таким id не существует'));
+});
 
-export default mongoose.model<IUser>('user', userSchema);
+export default mongoose.model<IUser, IUserModel>('user', userSchema);
