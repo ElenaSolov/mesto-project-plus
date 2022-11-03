@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import User from '../models/user';
-import { STATUS_200, STATUS_400, STATUS_404 } from '../constants';
+import {
+  STATUS_200, STATUS_400, STATUS_500, STATUS_404,
+} from '../constants';
 
 export const getUsers = async (req: Request, res: Response) => {
   await User.find({})
     .then((users) => {
       res.status(STATUS_200).send(users);
     })
-    .catch((err) => res.status(STATUS_400).send(err));
+    .catch((err) => res.status(STATUS_500).send(err));
 };
 
 export const createUser = async (req: Request, res: Response) => {
@@ -22,7 +24,7 @@ export const createUser = async (req: Request, res: Response) => {
     avatar,
   })
     .then((user) => res.status(201).send({ name: user.name, about: user.about }))
-    .catch((err) => res.status(STATUS_400).send(err));
+    .catch((err) => res.status(STATUS_500).send(err));
 };
 
 export const getUserById = async (req: Request, res: Response) => {

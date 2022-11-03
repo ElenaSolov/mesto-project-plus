@@ -1,12 +1,6 @@
-import mongoose, { Schema, Date, Types } from 'mongoose';
+import mongoose, { Schema, Date } from 'mongoose';
+import { ICard } from '../types';
 
-export interface ICard {
-  name: string;
-  link: string;
-  owner: Types.ObjectId;
-  likes: [];
-  createdAt: Date
-}
 const cardSchema = new Schema<ICard>({
   name: {
     type: String,

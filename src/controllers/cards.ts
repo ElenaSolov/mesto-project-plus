@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
 import Card from '../models/card';
 import User from '../models/user';
-import { STATUS_200, STATUS_204, STATUS_400 } from '../constants';
+import {
+  STATUS_200, STATUS_204, STATUS_400, STATUS_500,
+} from '../constants';
 
 export const getCards = async (req: Request, res: Response) => {
   await Card.find({})
     .then((cards) => {
       res.status(STATUS_200).send(cards);
     })
-    .catch((err) => res.status(STATUS_400).send(err));
+    .catch((err) => res.status(STATUS_500).send(err));
 };
 
 export const createCard = async (req: Request, res: Response) => {
@@ -26,14 +28,14 @@ export const createCard = async (req: Request, res: Response) => {
     owner,
   })
     .then((card) => res.status(201).send({ name: card.name, link: card.link }))
-    .catch((err) => res.status(STATUS_400).send(err));
+    .catch((err) => res.status(STATUS_500).send(err));
 };
 
 export const deleteCard = async (req:Request, res: Response) => {
   const { id } = req.params;
   await Card.findByIdAndRemove(id)
     .then(() => res.status(STATUS_204).send())
-    .catch(() => res.status(STATUS_400).send({ message: 'Карточка не найдена' }));
+    .catch(() => res.status(STATUS_500).send({ message: 'Карточка не найдена' }));
 };
 
 export const likeCard = async (req:Request, res: Response) => {
