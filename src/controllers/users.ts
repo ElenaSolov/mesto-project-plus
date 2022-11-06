@@ -6,7 +6,6 @@ import {
   STATUS_400,
   STATUS_500,
   STATUS_404,
-  nameAboutOrLinkNotProvided,
   VALIDATION_ERROR,
   userIdNotFound,
   serverError,
@@ -25,10 +24,7 @@ export const createUser = (req: Request, res: Response) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!name || !about || !avatar) {
-    res.status(STATUS_400).send({ message: nameAboutOrLinkNotProvided });
-    return;
-  } if (!email || !validator.isEmail(email) || !password) {
+  if (!email || !validator.isEmail(email) || !password) {
     res.status(STATUS_400).send({ message: notValidEmailOrPassword });
     return;
   }

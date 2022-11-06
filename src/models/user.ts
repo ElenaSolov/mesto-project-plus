@@ -1,29 +1,17 @@
 import mongoose, { Schema } from 'mongoose';
 
 export interface IUser {
-  name: string;
-  about: string;
-  avatar: string;
   email: string;
   password: string;
+  name?: string;
+  about?: string;
+  avatar?: string;
 }
 interface IUserModel extends mongoose.Model<IUser> {
   findUserById: (id: string) => Promise<mongoose.Document<unknown, never, IUser>>
 }
 
 const userSchema = new Schema<IUser, IUserModel>({
-  name: {
-    type: String,
-    required: true,
-    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
-    maxLength: [30, 'Должно быть максимум 30 букв, получено {VALUE}'],
-  },
-  about: {
-    type: String,
-    required: true,
-    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
-    maxLength: [200, 'Должно быть максимум 200 букв, получено {VALUE}'],
-  },
   email: {
     type: String,
     required: true,
@@ -34,9 +22,21 @@ const userSchema = new Schema<IUser, IUserModel>({
     required: true,
     minLength: [6, 'Пароль должен быть не менее 6 символов, получено {VALUE}'],
   },
+  name: {
+    type: String,
+    default: 'Жак-Ив Кусто',
+    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
+    maxLength: [30, 'Должно быть максимум 30 букв, получено {VALUE}'],
+  },
+  about: {
+    type: String,
+    default: 'Исследователь',
+    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
+    maxLength: [200, 'Должно быть максимум 200 букв, получено {VALUE}'],
+  },
   avatar: {
     type: String,
-    required: true,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });
 userSchema.static('findUserById', function findUserById(id: string) {
