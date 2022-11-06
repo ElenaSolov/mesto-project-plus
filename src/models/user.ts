@@ -13,14 +13,14 @@ const userSchema = new Schema<IUser, IUserModel>({
   name: {
     type: String,
     required: true,
-    minLength: 2,
-    maxLength: 30,
+    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
+    maxLength: [30, 'Должно быть максимум 30 букв, получено {VALUE}'],
   },
   about: {
     type: String,
     required: true,
-    minLength: 2,
-    maxLength: 200,
+    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
+    maxLength: [200, 'Должно быть максимум 200 букв, получено {VALUE}'],
   },
   avatar: {
     type: String,

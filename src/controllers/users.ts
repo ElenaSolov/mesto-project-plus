@@ -23,8 +23,16 @@ export const createUser = (req: Request, res: Response) => {
     about,
     avatar,
   })
-    .then((user) => res.status(201).send({ name: user.name, about: user.about }))
-    .catch((err) => res.status(STATUS_500).send(err));
+    .then((user) => {
+      res.status(201).send({ name: user.name, about: user.about });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(STATUS_400).send(err.message);
+      } else {
+        res.status(STATUS_500).send(err);
+      }
+    });
 };
 
 export const getUserById = (req: Request, res: Response) => {
