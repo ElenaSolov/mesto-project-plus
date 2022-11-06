@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import validator from 'validator';
+import bcrypt from 'bcrypt';
 import User from '../models/user';
 import {
   STATUS_400,
@@ -31,15 +32,16 @@ export const createUser = (req: Request, res: Response) => {
     res.status(STATUS_400).send({ message: notValidEmailOrPassword });
     return;
   }
-  User.create({
-    name,
-    about,
-    avatar,
-    email,
-    password,
-  })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => {
-      res.status(201).send({ name: user.name, about: user.about });
+      res.status(201).send({ user });
     })
     .catch((err) => {
       if (err.name === VALIDATION_ERROR) {
