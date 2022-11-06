@@ -128,3 +128,32 @@ export const updateUserAvatar = (req: Request, res: Response) => {
       }
     });
 };
+
+export const login = (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  if (!email || !validator.isEmail(email) || !password) {
+    res.status(STATUS_400).send({ message: notValidEmailOrPassword });
+    return;
+  }
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        res.status(STATUS_404).send({ message: notValidEmailOrPassword });
+        return;
+      }
+      // eslint-disable-next-line consistent-return
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        res.status(STATUS_404).send({ message: notValidEmailOrPassword });
+      } else {
+        res.send({ message: 'Всё верно!' });
+      }
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
