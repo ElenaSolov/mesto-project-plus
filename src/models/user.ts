@@ -4,6 +4,8 @@ export interface IUser {
   name: string;
   about: string;
   avatar: string;
+  email: string;
+  password: string;
 }
 interface IUserModel extends mongoose.Model<IUser> {
   findUserById: (id: string) => Promise<mongoose.Document<unknown, never, IUser>>
@@ -21,6 +23,15 @@ const userSchema = new Schema<IUser, IUserModel>({
     required: true,
     minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
     maxLength: [200, 'Должно быть максимум 200 букв, получено {VALUE}'],
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
   },
   avatar: {
     type: String,

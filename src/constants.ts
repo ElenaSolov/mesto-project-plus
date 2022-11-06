@@ -13,6 +13,7 @@ export const STATUS_500 = 500;
 export const DEFAULT_PORT = 3000;
 
 export const userIdNotFound = 'Пользователя с таким id не существует';
+export const notValidEmailOrPassword = 'Необходимо предоставить корректные имейл и пароль';
 export const nameOrLinkNotProvided = 'Необходимо предоставить имя и ссылку на фотографию';
 export const linkNotProvided = 'Необходимо предоставить ссылку на фотографию';
 export const nameAboutOrLinkNotProvided = 'Необходимо предоставить имя, описание и ссылку на фотографию';

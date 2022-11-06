@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import validator from 'validator';
 import User from '../models/user';
 import {
   STATUS_400,
@@ -8,7 +9,7 @@ import {
   VALIDATION_ERROR,
   userIdNotFound,
   serverError,
-  nameOrAboutNotProvided, CAST_ERROR, linkNotProvided,
+  nameOrAboutNotProvided, CAST_ERROR, linkNotProvided, notValidEmailOrPassword,
 } from '../constants';
 
 export const getUsers = (req: Request, res: Response) => {
@@ -20,10 +21,13 @@ export const getUsers = (req: Request, res: Response) => {
 };
 
 export const createUser = (req: Request, res: Response) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   if (!name || !about || !avatar) {
     res.status(STATUS_400).send({ message: nameAboutOrLinkNotProvided });
-    return;
+  } else if (!validator.isEmail(email) || !password) {
+    res.status(STATUS_400).send({ message: notValidEmailOrPassword });
   }
   User.create({
     name,
