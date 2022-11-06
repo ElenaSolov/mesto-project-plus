@@ -44,7 +44,13 @@ export const createUser = (req: Request, res: Response) => {
 
 export const getUserById = (req: Request, res: Response) => {
   const { id } = req.params;
-  User.findUserById(id).then((user) => res.send(user))
+  User.findUserById(id).then((user) => {
+    if (!user) {
+      res.status(STATUS_404).send({ message: userIdNotFound });
+    } else {
+      res.send(user);
+    }
+  })
     .catch((err) => {
       if (err === userIdNotFound) {
         res.status(STATUS_404).send({ message: userIdNotFound });
@@ -70,7 +76,13 @@ export const updateUserProfile = (req: Request, res: Response) => {
     new: true,
     runValidators: true,
   }).exec()
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(STATUS_404).send({ message: userIdNotFound });
+      } else {
+        res.send(user);
+      }
+    })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
         res.status(STATUS_404).send({ message: userIdNotFound });
@@ -94,7 +106,13 @@ export const updateUserAvatar = (req: Request, res: Response) => {
   }, {
     new: true,
   }).exec()
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(STATUS_404).send({ message: userIdNotFound });
+      } else {
+        res.send(user);
+      }
+    })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
         res.status(STATUS_404).send({ message: userIdNotFound });
