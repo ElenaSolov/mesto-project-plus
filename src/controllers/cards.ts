@@ -83,7 +83,7 @@ export const likeCard = (req:Request, res: Response) => {
     });
 };
 
-export const dislikeCard = async (req:Request, res: Response) => Card.findByIdAndUpdate(
+export const dislikeCard = (req:Request, res: Response) => Card.findByIdAndUpdate(
   req.params.cardId,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore

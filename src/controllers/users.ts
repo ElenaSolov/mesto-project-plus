@@ -80,7 +80,7 @@ export const updateUserProfile = (req: Request, res: Response) => {
     });
 };
 
-export const updateUserAvatar = async (req: Request, res: Response) => {
+export const updateUserAvatar = (req: Request, res: Response) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const id = req.user._id;
@@ -89,7 +89,7 @@ export const updateUserAvatar = async (req: Request, res: Response) => {
     res.status(STATUS_400).send({ message: linkNotProvided });
     return;
   }
-  await User.findByIdAndUpdate(id, {
+  User.findByIdAndUpdate(id, {
     avatar: req.body.avatar,
   }, {
     new: true,
