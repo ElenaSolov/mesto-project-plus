@@ -32,6 +32,7 @@ const userSchema = new Schema<IUser, IUserModel>({
   password: {
     type: String,
     required: true,
+    minLength: [6, 'Пароль должен быть не менее 6 символов, получено {VALUE}'],
   },
   avatar: {
     type: String,

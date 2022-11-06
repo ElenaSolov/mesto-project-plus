@@ -26,13 +26,17 @@ export const createUser = (req: Request, res: Response) => {
   } = req.body;
   if (!name || !about || !avatar) {
     res.status(STATUS_400).send({ message: nameAboutOrLinkNotProvided });
-  } else if (!validator.isEmail(email) || !password) {
+    return;
+  } if (!email || !validator.isEmail(email) || !password) {
     res.status(STATUS_400).send({ message: notValidEmailOrPassword });
+    return;
   }
   User.create({
     name,
     about,
     avatar,
+    email,
+    password,
   })
     .then((user) => {
       res.status(201).send({ name: user.name, about: user.about });
