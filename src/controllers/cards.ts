@@ -1,20 +1,19 @@
 import { Request, Response } from 'express';
 import Card from '../models/card';
-import User from '../models/user';
 import {
   cardIdNotProvided, cardNotFound,
   CAST_ERROR,
-  nameOrLinkNotProvided,
+  nameOrLinkNotProvided, serverError,
   STATUS_204, STATUS_400, STATUS_404, STATUS_500, userIdNotFound,
   userIdNotProvided, VALIDATION_ERROR,
 } from '../constants';
 
-export const getCards = async (req: Request, res: Response) => {
-  await Card.find({})
+export const getCards = (req: Request, res: Response) => {
+  Card.find({})
     .then((cards) => {
       res.send(cards);
     })
-    .catch((err) => res.status(STATUS_500).send(err));
+    .catch(() => res.status(STATUS_500).send({ message: serverError }));
 };
 
 export const createCard = (req: Request, res: Response) => {
@@ -26,12 +25,11 @@ export const createCard = (req: Request, res: Response) => {
     res.status(STATUS_400).send({ message: nameOrLinkNotProvided });
     return;
   }
-  User.findById(userId)
-    .then((owner) => Card.create({
-      name,
-      link,
-      owner,
-    }))
+  Card.create({
+    name,
+    link,
+    userId,
+  })
     .then((card) => res.status(201).send({ name: card.name, link: card.link }))
     .catch((err) => {
       if (err.name === CAST_ERROR) {
@@ -39,7 +37,7 @@ export const createCard = (req: Request, res: Response) => {
       } else if (err.name === VALIDATION_ERROR) {
         res.status(STATUS_400).send({ message: err.message });
       } else {
-        res.status(STATUS_500).send({ message: err });
+        res.status(STATUS_500).send({ message: serverError });
       }
     });
 };
@@ -50,12 +48,18 @@ export const deleteCard = (req:Request, res: Response) => {
     res.status(STATUS_400).send({ message: cardIdNotProvided });
   }
   Card.findByIdAndDelete(id)
-    .then(() => res.status(STATUS_204).send())
+    .then((card) => {
+      if (!card) {
+        res.status(STATUS_404).send({ message: cardNotFound });
+      } else {
+        res.status(STATUS_204).send();
+      }
+    })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
         res.status(STATUS_400).send({ message: cardNotFound });
       } else {
-        res.status(STATUS_500).send({ message: err });
+        res.status(STATUS_500).send({ message: serverError });
       }
     });
 };
@@ -71,7 +75,7 @@ export const likeCard = (req:Request, res: Response) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: ownerId } }, // добавить _id в массив, если его там нет
-    { new: true },
+    { new: true, runValidators: true },
   )
     .then((card) => {
       if (!card) {
@@ -84,7 +88,7 @@ export const likeCard = (req:Request, res: Response) => {
       if (err.name === CAST_ERROR) {
         res.status(STATUS_400).send({ message: cardNotFound });
       } else {
-        res.status(STATUS_500).send({ message: err });
+        res.status(STATUS_500).send({ message: serverError });
       }
     });
 };
@@ -94,7 +98,7 @@ export const dislikeCard = (req:Request, res: Response) => Card.findByIdAndUpdat
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   { $pull: { likes: req.user._id } },
-  { new: true },
+  { new: true, runValidators: true },
 )
   .then((card) => {
     if (!card) {
@@ -107,6 +111,6 @@ export const dislikeCard = (req:Request, res: Response) => Card.findByIdAndUpdat
     if (err.name === CAST_ERROR) {
       res.status(STATUS_400).send({ message: cardNotFound });
     } else {
-      res.status(STATUS_500).send({ message: err });
+      res.status(STATUS_500).send({ message: serverError });
     }
   });

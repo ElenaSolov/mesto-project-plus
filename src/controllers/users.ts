@@ -16,7 +16,7 @@ export const getUsers = (req: Request, res: Response) => {
     .then((users) => {
       res.send(users);
     })
-    .catch((err) => res.status(STATUS_500).send({ message: err }));
+    .catch(() => res.status(STATUS_500).send({ message: serverError }));
 };
 
 export const createUser = (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ export const createUser = (req: Request, res: Response) => {
       if (err.name === VALIDATION_ERROR) {
         res.status(STATUS_400).send({ message: err.message });
       } else {
-        res.status(STATUS_500).send({ message: err });
+        res.status(STATUS_500).send({ message: serverError });
       }
     });
 };
@@ -105,6 +105,7 @@ export const updateUserAvatar = (req: Request, res: Response) => {
     avatar: req.body.avatar,
   }, {
     new: true,
+    runValidators: true,
   }).exec()
     .then((user) => {
       if (!user) {
