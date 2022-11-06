@@ -11,3 +11,16 @@ export const STATUS_404 = 404;
 export const STATUS_500 = 500;
 
 export const DEFAULT_PORT = 3000;
+
+export const userIdNotFound = 'Пользователя с таким id не существует';
+export const nameOrLinkNotProvided = 'Необходимо предоставить имя и ссылку на фотографию';
+export const linkNotProvided = 'Необходимо предоставить ссылку на фотографию';
+export const nameAboutOrLinkNotProvided = 'Необходимо предоставить имя, описание и ссылку на фотографию';
+export const nameOrAboutNotProvided = 'Необходимо предоставить имя и описание';
+export const userIdNotProvided = 'Необходимо предоставить id пользователя';
+export const cardIdNotProvided = 'Необходимо предоставить id карточки';
+export const cardNotFound = 'Карточка не найдена';
+export const serverError = 'Ошибка сервера';
+
+export const CAST_ERROR = 'CastError';
+export const VALIDATION_ERROR = 'ValidationError';
