@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Card from '../models/card';
 import User from '../models/user';
 import {
-  STATUS_200, STATUS_204, STATUS_400, STATUS_404, STATUS_500,
+  STATUS_204, STATUS_400, STATUS_404, STATUS_500,
 } from '../constants';
 
 export const getCards = async (req: Request, res: Response) => {
@@ -86,10 +86,8 @@ export const dislikeCard = async (req:Request, res: Response) => Card.findByIdAn
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .then((card) => res.status(STATUS_200)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    .send({ name: card.name, link: card.link, likes: card.likes }))
+  .then((card) => res
+    .send({ name: card?.name, link: card?.link, likes: card?.likes }))
   .catch((err) => {
     if (err.name === 'CastError') {
       res.status(STATUS_400).send({ message: 'Карточка не найдена' });
