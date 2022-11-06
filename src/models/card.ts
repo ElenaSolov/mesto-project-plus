@@ -11,8 +11,8 @@ const cardSchema = new Schema<ICard>({
   name: {
     type: String,
     required: true,
-    minLength: 2,
-    maxLength: 30,
+    minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
+    maxLength: [30, 'Должно быть максимум 200 букв, получено {VALUE}'],
   },
   link: {
     type: String,

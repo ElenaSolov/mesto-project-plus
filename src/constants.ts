@@ -1,5 +1,5 @@
 export const uri = 'mongodb+srv://seaver:UMk88Df44p0dGH6c@cluster0.qf2ysmc.mongodb.net/?retryWrites=true&w=majority';
-export const myUserId = '635e64d7e2b2841dd47bdf1c1';
+export const myUserId = '635e64d7e2b2841dd47bdf1c';
 
 // status codes
 
