@@ -73,7 +73,13 @@ export const likeCard = (req:Request, res: Response) => {
     { $addToSet: { likes: ownerId } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .then((card) => res.send({ name: card?.name, link: card?.link, likes: card?.likes }))
+    .then((card) => {
+      if (!card) {
+        res.status(STATUS_404).send({ message: cardNotFound });
+      } else {
+        res.send({ name: card.name, link: card.link, likes: card.likes });
+      }
+    })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
         res.status(STATUS_400).send({ message: cardNotFound });
@@ -90,8 +96,13 @@ export const dislikeCard = (req:Request, res: Response) => Card.findByIdAndUpdat
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .then((card) => res
-    .send({ name: card?.name, link: card?.link, likes: card?.likes }))
+  .then((card) => {
+    if (!card) {
+      res.status(STATUS_404).send({ message: cardNotFound });
+    } else {
+      res.send({ name: card.name, link: card.link, likes: card.likes });
+    }
+  })
   .catch((err) => {
     if (err.name === CAST_ERROR) {
       res.status(STATUS_400).send({ message: cardNotFound });
