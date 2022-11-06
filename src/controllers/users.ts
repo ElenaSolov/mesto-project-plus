@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import {
   STATUS_400,
@@ -9,7 +10,8 @@ import {
   VALIDATION_ERROR,
   userIdNotFound,
   serverError,
-  nameOrAboutNotProvided, CAST_ERROR, linkNotProvided, notValidEmailOrPassword,
+  nameOrAboutNotProvided, CAST_ERROR, linkNotProvided,
+  notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
 } from '../constants';
 
 export const getUsers = (req: Request, res: Response) => {
@@ -135,20 +137,16 @@ export const login = (req: Request, res: Response) => {
     res.status(STATUS_400).send({ message: notValidEmailOrPassword });
     return;
   }
-  User.findOne({ email })
+  User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         res.status(STATUS_404).send({ message: notValidEmailOrPassword });
-        return;
-      }
-      // eslint-disable-next-line consistent-return
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) {
-        res.status(STATUS_404).send({ message: notValidEmailOrPassword });
       } else {
-        res.send({ message: 'Всё верно!' });
+        const token = `Bearer: ${jwt.sign({ _id: user._id }, 'secret', { expiresIn: ONE_WEEK })}`;
+        res.cookie('token', token, {
+          httpOnly: true,
+          maxAge: ONE_WEEK_IN_MS,
+        }).send({ token });
       }
     })
     .catch((err) => {

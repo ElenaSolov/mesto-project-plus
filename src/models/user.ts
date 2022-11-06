@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
 
 export interface IUser {
   email: string;
@@ -8,7 +9,9 @@ export interface IUser {
   avatar?: string;
 }
 interface IUserModel extends mongoose.Model<IUser> {
-  findUserById: (id: string) => Promise<mongoose.Document<unknown, never, IUser>>
+  findUserById: (id: string) => Promise<mongoose.Document<unknown, never, IUser>>;
+  findUserByCredentials: (email: string, password: string) =>
+    Promise<mongoose.Document<unknown, never, IUser>>
 }
 
 const userSchema = new Schema<IUser, IUserModel>({
@@ -44,6 +47,21 @@ userSchema.static('findUserById', function findUserById(id: string) {
     .then((user) => user)
     // eslint-disable-next-line prefer-promise-reject-errors
     .catch(() => Promise.reject('Пользователя с таким id не существует'));
+});
+userSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {
+  return this.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Неправильные почта или пароль'));
+          }
+          return user;
+        });
+    });
 });
 
 export default mongoose.model<IUser, IUserModel>('user', userSchema);

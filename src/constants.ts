@@ -3,7 +3,6 @@ export const myUserId = '635e64d7e2b2841dd47bdf1c';
 
 // status codes
 
-export const STATUS_200 = 200;
 export const STATUS_201 = 201;
 export const STATUS_204 = 204;
 export const STATUS_400 = 400;
@@ -25,3 +24,6 @@ export const serverError = 'Ошибка сервера';
 
 export const CAST_ERROR = 'CastError';
 export const VALIDATION_ERROR = 'ValidationError';
+
+export const ONE_WEEK = '7d';
+export const ONE_WEEK_IN_MS = 604800000;
