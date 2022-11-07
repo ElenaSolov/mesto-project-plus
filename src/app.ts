@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import { uri, DEFAULT_PORT } from './constants';
-import addUserToRequest from './middleware/addUserToRequest';
 import { createUser, login } from './controllers/users';
+import auth from './middleware/auth';
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -17,12 +17,12 @@ run().then(() => app.listen(PORT, () => {
 }))
   .catch((err) => console.log(err));
 
-app.use('/', addUserToRequest);
 app.use(express.json());
+app.post('/signup', createUser);
+app.post('/signin', login);
+app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.post('/signin', login);
-app.post('/signup', createUser);
 
 app.get('/', (req, res) => {
   res.send('Mesto App');

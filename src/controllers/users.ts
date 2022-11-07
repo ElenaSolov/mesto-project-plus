@@ -11,8 +11,9 @@ import {
   userIdNotFound,
   serverError,
   nameOrAboutNotProvided, CAST_ERROR, linkNotProvided,
-  notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
+  notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS, jwtsecret,
 } from '../constants';
+import { IGetUserAuthInfoRequest } from '../types';
 
 export const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -142,7 +143,7 @@ export const login = (req: Request, res: Response) => {
       if (!user) {
         res.status(STATUS_404).send({ message: notValidEmailOrPassword });
       } else {
-        const token = `Bearer: ${jwt.sign({ _id: user._id }, 'secret', { expiresIn: ONE_WEEK })}`;
+        const token = `Bearer: ${jwt.sign({ _id: user._id }, jwtsecret, { expiresIn: ONE_WEEK })}`;
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ONE_WEEK_IN_MS,
@@ -154,4 +155,9 @@ export const login = (req: Request, res: Response) => {
         .status(401)
         .send({ message: err.message });
     });
+};
+export const getUserInfo = (req: IGetUserAuthInfoRequest, res: Response) => {
+  const owner = req.user;
+  console.log(1, owner);
+  res.send(owner);
 };
