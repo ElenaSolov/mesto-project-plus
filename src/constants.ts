@@ -1,5 +1,4 @@
 export const uri = 'mongodb+srv://seaver:UMk88Df44p0dGH6c@cluster0.qf2ysmc.mongodb.net/?retryWrites=true&w=majority';
-export const myUserId = '635e64d7e2b2841dd47bdf1c';
 export const jwtsecret = 'secret';
 
 // status codes
@@ -17,7 +16,6 @@ export const userIdNotFound = 'Пользователя с таким id не с
 export const notValidEmailOrPassword = 'Необходимо предоставить корректные имейл и пароль';
 export const nameOrLinkNotProvided = 'Необходимо предоставить имя и ссылку на фотографию';
 export const linkNotProvided = 'Необходимо предоставить ссылку на фотографию';
-export const nameAboutOrLinkNotProvided = 'Необходимо предоставить имя, описание и ссылку на фотографию';
 export const nameOrAboutNotProvided = 'Необходимо предоставить имя и описание';
 export const userIdNotProvided = 'Необходимо предоставить id пользователя';
 export const cardIdNotProvided = 'Необходимо предоставить id карточки';

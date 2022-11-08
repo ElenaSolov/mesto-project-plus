@@ -5,6 +5,7 @@ import cardsRouter from './routes/cards';
 import { uri, DEFAULT_PORT } from './constants';
 import { createUser, login } from './controllers/users';
 import auth from './middleware/auth';
+import { requestLogger, errorLogger } from './middleware/logger';
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -17,12 +18,14 @@ run().then(() => app.listen(PORT, () => {
 }))
   .catch((err) => console.log(err));
 
+app.use(requestLogger);
 app.use(express.json());
 app.post('/signup', createUser);
 app.post('/signin', login);
 app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+app.use(errorLogger);
 
 app.get('/', (req, res) => {
   res.send('Mesto App');
