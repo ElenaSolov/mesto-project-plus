@@ -8,11 +8,13 @@ export const STATUS_204 = 204;
 export const STATUS_400 = 400;
 export const STATUS_401 = 401;
 export const STATUS_404 = 404;
+export const STATUS_409 = 409;
 export const STATUS_500 = 500;
 
 export const DEFAULT_PORT = 3000;
 
 export const userIdNotFound = 'Пользователя с таким id не существует';
+export const userAlreadyExist = 'Имейл уже зарегистрирован';
 export const notValidEmailOrPassword = 'Необходимо предоставить корректные имейл и пароль';
 export const nameOrLinkNotProvided = 'Необходимо предоставить имя и ссылку на фотографию';
 export const linkNotProvided = 'Необходимо предоставить ссылку на фотографию';
