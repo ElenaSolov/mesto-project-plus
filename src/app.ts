@@ -22,7 +22,7 @@ app.use(requestLogger);
 app.use(express.json());
 app.post('/signup', createUser);
 app.post('/signin', login);
-app.use(auth);
+app.use(auth as express.RequestHandler);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use(errorLogger);
