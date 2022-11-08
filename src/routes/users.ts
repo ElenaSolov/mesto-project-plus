@@ -6,10 +6,10 @@ import {
 const router = Router();
 
 router.get('/', getUsers);
-router.get('/:id', getUserById);
-
-router.patch('/me', updateUserProfile);
 router.get('/me', getUserInfo);
+router.get('/:id', getUserById);
+router.patch('/me', updateUserProfile);
+
 router.patch('/me/avatar', updateUserAvatar);
 
 export default router;

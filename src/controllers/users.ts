@@ -11,7 +11,7 @@ import {
   userIdNotFound,
   serverError,
   nameOrAboutNotProvided, CAST_ERROR, linkNotProvided,
-  notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS, jwtsecret,
+  notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS, jwtsecret, needAuthorization,
 } from '../constants';
 import { IGetUserAuthInfoRequest } from '../types';
 
@@ -55,14 +55,14 @@ export const getUserById = (req: Request, res: Response) => {
   const { id } = req.params;
   User.findUserById(id).then((user) => {
     if (!user) {
-      res.status(STATUS_404).send({ message: userIdNotFound });
+      res.status(STATUS_404).send({ message: userIdNotFound, err: 1 });
     } else {
       res.send(user);
     }
   })
     .catch((err) => {
       if (err === userIdNotFound) {
-        res.status(STATUS_404).send({ message: userIdNotFound });
+        res.status(STATUS_404).send({ message: userIdNotFound, err: 2 });
       } else {
         res.status(STATUS_500).send({ message: serverError });
       }
@@ -87,14 +87,14 @@ export const updateUserProfile = (req: Request, res: Response) => {
   }).exec()
     .then((user) => {
       if (!user) {
-        res.status(STATUS_404).send({ message: userIdNotFound });
+        res.status(STATUS_404).send({ message: userIdNotFound, err: 3 });
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        res.status(STATUS_404).send({ message: userIdNotFound });
+        res.status(STATUS_404).send({ message: userIdNotFound, err: 4 });
       } else {
         res.status(STATUS_500).send({ message: serverError });
       }
@@ -118,14 +118,14 @@ export const updateUserAvatar = (req: Request, res: Response) => {
   }).exec()
     .then((user) => {
       if (!user) {
-        res.status(STATUS_404).send({ message: userIdNotFound });
+        res.status(STATUS_404).send({ message: userIdNotFound, err: 5 });
       } else {
         res.send(user);
       }
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        res.status(STATUS_404).send({ message: userIdNotFound });
+        res.status(STATUS_404).send({ message: userIdNotFound, err: 6 });
       } else {
         res.status(STATUS_500).send({ message: serverError });
       }
@@ -158,6 +158,19 @@ export const login = (req: Request, res: Response) => {
 };
 export const getUserInfo = (req: IGetUserAuthInfoRequest, res: Response) => {
   const owner = req.user;
-  console.log(1, owner);
-  res.send(owner);
+  if (owner) {
+    User.findUserById(owner._id)
+      .then((user) => {
+        if (!user) {
+          res.status(STATUS_404).send({ message: notValidEmailOrPassword });
+        } else {
+          res.send(user);
+        }
+      })
+      .catch(() => {
+        res.status(STATUS_500).send({ message: serverError });
+      });
+  } else {
+    res.status(STATUS_404).send({ message: needAuthorization });
+  }
 };
