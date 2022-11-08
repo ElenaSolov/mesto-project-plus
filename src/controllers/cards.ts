@@ -7,6 +7,7 @@ import {
   STATUS_204, STATUS_400, STATUS_404, STATUS_500, userIdNotFound,
   userIdNotProvided, VALIDATION_ERROR,
 } from '../constants';
+import { IRequestWithAuth } from '../types';
 
 export const getCards = (req: Request, res: Response) => {
   Card.find({})
@@ -16,10 +17,8 @@ export const getCards = (req: Request, res: Response) => {
     .catch(() => res.status(STATUS_500).send({ message: serverError }));
 };
 
-export const createCard = (req: Request, res: Response) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const userId = req.user._id;
+export const createCard = (req: IRequestWithAuth, res: Response) => {
+  const owner = req.user._id;
   const { name, link } = req.body;
   if (!name || !link) {
     res.status(STATUS_400).send({ message: nameOrLinkNotProvided });
@@ -28,7 +27,7 @@ export const createCard = (req: Request, res: Response) => {
   Card.create({
     name,
     link,
-    userId,
+    owner,
   })
     .then((card) => res.status(201).send({ name: card.name, link: card.link }))
     .catch((err) => {
@@ -42,7 +41,8 @@ export const createCard = (req: Request, res: Response) => {
     });
 };
 
-export const deleteCard = (req:Request, res: Response) => {
+export const deleteCard = (req:IRequestWithAuth, res: Response) => {
+  const owner = req.user._id;
   const { id } = req.params;
   if (!id) {
     res.status(STATUS_400).send({ message: cardIdNotProvided });

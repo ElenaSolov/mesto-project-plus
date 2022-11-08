@@ -13,7 +13,7 @@ import {
   nameOrAboutNotProvided, CAST_ERROR, linkNotProvided,
   notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS, jwtsecret, needAuthorization,
 } from '../constants';
-import { IGetUserAuthInfoRequest } from '../types';
+import { IRequestWithAuth } from '../types';
 
 export const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -156,7 +156,7 @@ export const login = (req: Request, res: Response) => {
         .send({ message: err.message });
     });
 };
-export const getUserInfo = (req: IGetUserAuthInfoRequest, res: Response) => {
+export const getUserInfo = (req: IRequestWithAuth, res: Response) => {
   const owner = req.user;
   if (owner) {
     User.findUserById(owner._id)
