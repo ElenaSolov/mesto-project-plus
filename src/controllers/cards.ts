@@ -3,8 +3,8 @@ import Card from '../models/card';
 import {
   cardIdNotProvided, cardNotFound,
   CAST_ERROR,
-  nameOrLinkNotProvided, serverError,
-  STATUS_204, STATUS_400, STATUS_404, STATUS_500, userIdNotFound,
+  nameOrLinkNotProvided, noRightsMessage, serverError,
+  STATUS_204, STATUS_400, STATUS_401, STATUS_404, STATUS_500, userIdNotFound,
   userIdNotProvided, VALIDATION_ERROR,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
@@ -18,7 +18,7 @@ export const getCards = (req: Request, res: Response) => {
 };
 
 export const createCard = (req: IRequestWithAuth, res: Response) => {
-  const owner = req.user._id;
+  const ownerId = req.user._id;
   const { name, link } = req.body;
   if (!name || !link) {
     res.status(STATUS_400).send({ message: nameOrLinkNotProvided });
@@ -27,7 +27,7 @@ export const createCard = (req: IRequestWithAuth, res: Response) => {
   Card.create({
     name,
     link,
-    owner,
+    owner: ownerId,
   })
     .then((card) => res.status(201).send({ name: card.name, link: card.link }))
     .catch((err) => {
@@ -42,17 +42,25 @@ export const createCard = (req: IRequestWithAuth, res: Response) => {
 };
 
 export const deleteCard = (req:IRequestWithAuth, res: Response) => {
-  const owner = req.user._id;
+  const ownerId = req.user._id;
   const { id } = req.params;
   if (!id) {
     res.status(STATUS_400).send({ message: cardIdNotProvided });
   }
-  Card.findByIdAndDelete(id)
+  Card.findOne({ _id: id })
     .then((card) => {
       if (!card) {
+        console.log(1);
         res.status(STATUS_404).send({ message: cardNotFound });
       } else {
-        res.status(STATUS_204).send();
+        console.log(2);
+        if (card.owner.toString() !== ownerId) {
+          res.status(STATUS_401).send({ message: noRightsMessage });
+        } else {
+          Card.deleteOne({ _id: card.id })
+            .then(() => res.status(STATUS_204).send())
+            .catch((err) => Promise.reject(err));
+        }
       }
     })
     .catch((err) => {

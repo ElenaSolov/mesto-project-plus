@@ -24,6 +24,7 @@ export const cardIdNotProvided = 'Необходимо предоставить 
 export const cardNotFound = 'Карточка не найдена';
 export const serverError = 'Ошибка сервера';
 export const needAuthorization = 'Необходима авторизация';
+export const noRightsMessage = 'Нельзя удалять карточки других пользователей';
 
 export const CAST_ERROR = 'CastError';
 export const VALIDATION_ERROR = 'ValidationError';
