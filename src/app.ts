@@ -6,6 +6,7 @@ import { uri, DEFAULT_PORT } from './constants';
 import { createUser, login } from './controllers/users';
 import auth from './middleware/auth';
 import { requestLogger, errorLogger } from './middleware/logger';
+import handleErrors from './middleware/handleErrors';
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -26,6 +27,7 @@ app.use(auth as express.RequestHandler);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use(errorLogger);
+app.use(handleErrors);
 
 app.get('/', (req, res) => {
   res.send('Mesto App');

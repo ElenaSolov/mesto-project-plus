@@ -1,84 +1,62 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import {
-  cardIdNotProvided, cardNotFound,
-  CAST_ERROR,
-  nameOrLinkNotProvided, noRightsMessage, serverError,
-  STATUS_204, STATUS_400, STATUS_401, STATUS_404, STATUS_500, userIdNotFound,
-  userIdNotProvided, VALIDATION_ERROR,
+  messageCardNotFound,
+  messageNameOrLinkNotProvided, messageNoRights,
+  STATUS_204, messageUserIdNotProvided, STATUS_201, messageNotValidId,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
+import validateId from '../helpers/validateId';
 
-export const getCards = (req: Request, res: Response) => {
+export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => {
       res.send(cards);
     })
-    .catch(() => res.status(STATUS_500).send({ message: serverError }));
+    .catch(next);
 };
 
-export const createCard = (req: IRequestWithAuth, res: Response) => {
-  const ownerId = req.user._id;
+export const createCard = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
+  const ownerId = req.user?._id;
   const { name, link } = req.body;
   if (!name || !link) {
-    res.status(STATUS_400).send({ message: nameOrLinkNotProvided });
-    return;
+    next(messageNameOrLinkNotProvided);
   }
   Card.create({
     name,
     link,
     owner: ownerId,
   })
-    .then((card) => res.status(201).send({ name: card.name, link: card.link }))
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        res.status(STATUS_404).send({ message: userIdNotFound });
-      } else if (err.name === VALIDATION_ERROR) {
-        res.status(STATUS_400).send({ message: err.message });
-      } else {
-        res.status(STATUS_500).send({ message: serverError });
-      }
-    });
+    .then((card) => res.status(STATUS_201)
+      .send(card))
+    .catch(next);
 };
 
-export const deleteCard = (req:IRequestWithAuth, res: Response) => {
-  const ownerId = req.user._id;
+export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
+  const ownerId = req.user?._id;
   const { id } = req.params;
-  if (!id) {
-    res.status(STATUS_400).send({ message: cardIdNotProvided });
-  }
+  if (!validateId(id)) return next(messageNotValidId);
   Card.findOne({ _id: id })
     .then((card) => {
       if (!card) {
-        console.log(1);
-        res.status(STATUS_404).send({ message: cardNotFound });
+        next(messageCardNotFound);
+      } else if (card.owner.toString() !== ownerId) {
+        next(messageNoRights);
       } else {
-        console.log(2);
-        if (card.owner.toString() !== ownerId) {
-          res.status(STATUS_401).send({ message: noRightsMessage });
-        } else {
-          Card.deleteOne({ _id: card.id })
-            .then(() => res.status(STATUS_204).send())
-            .catch((err) => Promise.reject(err));
-        }
+        Card.deleteOne({ _id: card.id })
+          .then(() => res.status(STATUS_204).send())
+          .catch(next);
       }
     })
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        res.status(STATUS_400).send({ message: cardNotFound });
-      } else {
-        res.status(STATUS_500).send({ message: serverError });
-      }
-    });
+    .catch(next);
 };
 
-export const likeCard = (req:Request, res: Response) => {
+export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const ownerId = req.user._id;
+  if (!validateId(cardId)) return next(messageNotValidId);
+  const ownerId = req.user?._id;
   if (!ownerId) {
-    res.status(STATUS_400).send({ message: userIdNotProvided });
+    next(messageUserIdNotProvided);
   }
   Card.findByIdAndUpdate(
     cardId,
@@ -87,38 +65,29 @@ export const likeCard = (req:Request, res: Response) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(STATUS_404).send({ message: cardNotFound });
+        next(messageCardNotFound);
       } else {
         res.send({ name: card.name, link: card.link, likes: card.likes });
       }
     })
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        res.status(STATUS_400).send({ message: cardNotFound });
-      } else {
-        res.status(STATUS_500).send({ message: serverError });
-      }
-    });
+    .catch(next);
 };
 
-export const dislikeCard = (req:Request, res: Response) => Card.findByIdAndUpdate(
-  req.params.cardId,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  { $pull: { likes: req.user._id } },
-  { new: true, runValidators: true },
-)
-  .then((card) => {
-    if (!card) {
-      res.status(STATUS_404).send({ message: cardNotFound });
-    } else {
-      res.send({ name: card.name, link: card.link, likes: card.likes });
-    }
-  })
-  .catch((err) => {
-    if (err.name === CAST_ERROR) {
-      res.status(STATUS_400).send({ message: cardNotFound });
-    } else {
-      res.status(STATUS_500).send({ message: serverError });
-    }
-  });
+export const dislikeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
+  const { cardId } = req.params;
+  if (!validateId(cardId)) return next(messageNotValidId);
+  Card
+    .findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: req.user?._id } },
+      { new: true, runValidators: true },
+    )
+    .then((card) => {
+      if (!card) {
+        next(messageCardNotFound);
+      } else {
+        res.send({ name: card.name, link: card.link, likes: card.likes });
+      }
+    })
+    .catch(next);
+};

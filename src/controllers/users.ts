@@ -1,41 +1,37 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import {
-  STATUS_400,
-  STATUS_500,
-  STATUS_404,
-  VALIDATION_ERROR,
-  userIdNotFound,
-  serverError,
-  nameOrAboutNotProvided, CAST_ERROR, linkNotProvided,
-  notValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
-  jwtsecret, needAuthorization, STATUS_409, userAlreadyExist,
+  messageUserIdNotFound,
+  messageServerError,
+  messageNameOrAboutNotProvided, messageLinkNotProvided,
+  messageNotValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
+  jwtsecret, messageNeedAuthorization, messageUserAlreadyExist, messageUserCreated,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
 
-export const getUsers = (req: Request, res: Response) => {
+export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => {
       res.send(users);
     })
-    .catch(() => res.status(STATUS_500).send({ message: serverError }));
+    .catch(next);
 };
 
-export const createUser = (req: Request, res: Response) => {
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
   if (!email || !validator.isEmail(email) || !password) {
-    res.status(STATUS_400).send({ message: notValidEmailOrPassword });
+    next(messageNotValidEmailOrPassword);
     return;
   }
   User.findOne({ email })
     .then((candidate) => {
       if (candidate) {
-        res.status(STATUS_409).send({ message: userAlreadyExist });
+        next(messageUserAlreadyExist);
       } else {
         bcrypt.hash(password, 10)
           .then((hash) => User.create({
@@ -46,44 +42,32 @@ export const createUser = (req: Request, res: Response) => {
             password: hash,
           }))
           .then((user) => {
-            res.status(201).send({ user });
+            if (!user) next(messageServerError);
+            res.status(201)
+              .send({ message: messageUserCreated, user: user.name, email: user.email });
           })
-          .catch((err) => {
-            if (err.name === VALIDATION_ERROR) {
-              res.status(STATUS_400).send({ message: err.message });
-            } else {
-              res.status(STATUS_500).send({ message: serverError });
-            }
-          });
+          .catch(next);
       }
     });
 };
 
-export const getUserById = (req: Request, res: Response) => {
+export const getUserById = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   User.findUserById(id).then((user) => {
     if (!user) {
-      res.status(STATUS_404).send({ message: userIdNotFound, err: 1 });
+      next(messageUserIdNotFound);
     } else {
       res.send(user);
     }
   })
-    .catch((err) => {
-      if (err === userIdNotFound) {
-        res.status(STATUS_404).send({ message: userIdNotFound, err: 2 });
-      } else {
-        res.status(STATUS_500).send({ message: serverError });
-      }
-    });
+    .catch(next);
 };
 
-export const updateUserProfile = (req: Request, res: Response) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const id = req.user._id;
+export const updateUserProfile = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
+  const id = req.user?._id;
   const { name, about } = req.body;
-  if (!name || !about) {
-    res.status(STATUS_400).send({ message: nameOrAboutNotProvided });
+  if (!name && !about) {
+    next(messageNameOrAboutNotProvided);
     return;
   }
   User.findByIdAndUpdate(id, {
@@ -95,27 +79,19 @@ export const updateUserProfile = (req: Request, res: Response) => {
   }).exec()
     .then((user) => {
       if (!user) {
-        res.status(STATUS_404).send({ message: userIdNotFound, err: 3 });
+        next(messageUserIdNotFound);
       } else {
         res.send(user);
       }
     })
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        res.status(STATUS_404).send({ message: userIdNotFound, err: 4 });
-      } else {
-        res.status(STATUS_500).send({ message: serverError });
-      }
-    });
+    .catch(next);
 };
 
-export const updateUserAvatar = (req: Request, res: Response) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const id = req.user._id;
+export const updateUserAvatar = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
+  const id = req.user?._id;
   const { avatar } = req.body;
   if (!avatar) {
-    res.status(STATUS_400).send({ message: linkNotProvided });
+    next(messageLinkNotProvided);
     return;
   }
   User.findByIdAndUpdate(id, {
@@ -126,30 +102,24 @@ export const updateUserAvatar = (req: Request, res: Response) => {
   }).exec()
     .then((user) => {
       if (!user) {
-        res.status(STATUS_404).send({ message: userIdNotFound, err: 5 });
+        next(messageUserIdNotFound);
       } else {
         res.send(user);
       }
     })
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        res.status(STATUS_404).send({ message: userIdNotFound, err: 6 });
-      } else {
-        res.status(STATUS_500).send({ message: serverError });
-      }
-    });
+    .catch(next);
 };
 
-export const login = (req: Request, res: Response) => {
+export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   if (!email || !validator.isEmail(email) || !password) {
-    res.status(STATUS_400).send({ message: notValidEmailOrPassword });
+    next(messageNotValidEmailOrPassword);
     return;
   }
   User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        res.status(STATUS_404).send({ message: notValidEmailOrPassword });
+        next(messageNotValidEmailOrPassword);
       } else {
         const token = `Bearer: ${jwt.sign({ _id: user._id }, jwtsecret, { expiresIn: ONE_WEEK })}`;
         res.cookie('token', token, {
@@ -158,27 +128,21 @@ export const login = (req: Request, res: Response) => {
         }).send({ token });
       }
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
-export const getUserInfo = (req: IRequestWithAuth, res: Response) => {
+export const getUserInfo = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
   const owner = req.user;
   if (owner) {
     User.findUserById(owner._id)
       .then((user) => {
         if (!user) {
-          res.status(STATUS_404).send({ message: notValidEmailOrPassword });
+          next(messageNotValidEmailOrPassword);
         } else {
           res.send(user);
         }
       })
-      .catch(() => {
-        res.status(STATUS_500).send({ message: serverError });
-      });
+      .catch(next);
   } else {
-    res.status(STATUS_404).send({ message: needAuthorization });
+    next(messageNeedAuthorization);
   }
 };

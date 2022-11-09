@@ -5,5 +5,5 @@ export interface IOwner extends JwtPayload {
   _id: string;
 }
 export interface IRequestWithAuth extends Request {
-  user: IOwner;
+  user?: IOwner;
 }

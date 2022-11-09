@@ -1,5 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
+import {
+  defaultAbout,
+  defaultAvatar,
+  defaultName,
+  messageAuthorizationFailed,
+  messageUserIdNotFound,
+} from '../constants';
 
 export interface IUser {
   email: string;
@@ -28,37 +35,36 @@ const userSchema = new Schema<IUser, IUserModel>({
   },
   name: {
     type: String,
-    default: 'Жак-Ив Кусто',
+    default: defaultName,
     minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
     maxLength: [30, 'Должно быть максимум 30 букв, получено {VALUE}'],
   },
   about: {
     type: String,
-    default: 'Исследователь',
+    default: defaultAbout,
     minLength: [2, 'Должно быть минимум 2 буквы, получено {VALUE}'],
     maxLength: [200, 'Должно быть максимум 200 букв, получено {VALUE}'],
   },
   avatar: {
     type: String,
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    default: defaultAvatar,
   },
 });
 userSchema.static('findUserById', function findUserById(id: string) {
   return this.findOne({ _id: id }) // this — это модель User
     .then((user) => user)
-    // eslint-disable-next-line prefer-promise-reject-errors
-    .catch(() => Promise.reject('Пользователя с таким id не существует'));
+    .catch(() => Promise.reject(messageUserIdNotFound));
 });
 userSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return Promise.reject(messageAuthorizationFailed);
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(messageAuthorizationFailed);
           }
           return user;
         });
