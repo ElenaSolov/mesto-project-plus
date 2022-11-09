@@ -32,6 +32,7 @@ export const messageNeedAuthorization = 'Необходима авторизац
 export const messageNoRights = 'Нельзя удалять карточки других пользователей';
 export const messageAuthorizationFailed = 'Неправильные почта или пароль';
 export const messageNotValidId = 'Не корректный id';
+export const messageNotValidLink = 'Не корректная ссылка';
 
 export const CAST_ERROR = 'CastError';
 export const VALIDATION_ERROR = 'ValidationError';

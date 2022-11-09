@@ -15,7 +15,8 @@ import {
   messageLinkNotProvided,
   messageNameOrLinkNotProvided,
   messageNeedAuthorization,
-  messageAuthorizationFailed, STATUS_401, messageCardNotFound, messageNoRights, messageNotValidId,
+  messageAuthorizationFailed, STATUS_401,
+  messageCardNotFound, messageNoRights, messageNotValidId, messageNotValidLink,
 } from '../constants';
 
 const makeError = (err: string) => ({ message: err });
@@ -28,6 +29,7 @@ export default (err: string | Error, req: Request, res: Response, next: NextFunc
   switch (err) {
     case messageNotValidEmailOrPassword:
     case messageNotValidId:
+    case messageNotValidLink:
     case VALIDATION_ERROR:
     case messageNameOrAboutNotProvided:
     case messageLinkNotProvided:
