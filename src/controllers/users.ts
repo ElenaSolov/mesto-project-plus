@@ -8,7 +8,7 @@ import {
   messageServerError,
   messageNameOrAboutNotProvided, messageLinkNotProvided,
   messageNotValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
-  jwtsecret, messageNeedAuthorization, messageUserAlreadyExist, messageUserCreated,
+  jwtsecret, messageNeedAuthorization, messageUserCreated,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
 
@@ -28,27 +28,21 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     next(messageNotValidEmailOrPassword);
     return;
   }
-  User.findOne({ email })
-    .then((candidate) => {
-      if (candidate) {
-        next(messageUserAlreadyExist);
-      } else {
-        bcrypt.hash(password, 10)
-          .then((hash) => User.create({
-            name,
-            about,
-            avatar,
-            email,
-            password: hash,
-          }))
-          .then((user) => {
-            if (!user) next(messageServerError);
-            res.status(201)
-              .send({ message: messageUserCreated, user: user.name, email: user.email });
-          })
-          .catch(next);
-      }
-    });
+  bcrypt.hash(password, 10)
+    .then((hash) => User.init()
+      .then(() => User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      }))
+      .then((user) => {
+        if (!user) next(messageServerError);
+        res.status(201)
+          .send({ message: messageUserCreated, user: user.name, email: user.email });
+      }))
+    .catch(next);
 };
 
 export const getUserById = (req: Request, res: Response, next: NextFunction) => {

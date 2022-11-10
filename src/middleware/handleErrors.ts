@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Error } from 'mongoose';
 import {
   messageNotValidEmailOrPassword,
   messageServerError,
@@ -16,15 +15,20 @@ import {
   messageNameOrLinkNotProvided,
   messageNeedAuthorization,
   messageAuthorizationFailed, STATUS_401,
-  messageCardNotFound, messageNoRights, messageNotValidId, messageNotValidLink,
+  messageCardNotFound, messageNoRights, messageNotValidId, messageNotValidLink, CAST_ERROR,
 } from '../constants';
+import { IError } from '../types';
 
 const makeError = (err: string) => ({ message: err });
 
-export default (err: string | Error, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof Error) {
-    res.status(STATUS_400).send(makeError(err.message));
-    return;
+export default (err: IError | string, req: Request, res: Response, next: NextFunction) => {
+  if (typeof err !== 'string') {
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      return res.status(STATUS_409).send(messageUserAlreadyExist);
+    }
+    if (err.name === CAST_ERROR || err.name === VALIDATION_ERROR) {
+      return res.status(STATUS_400).send(makeError(err.message));
+    }
   }
   switch (err) {
     case messageNotValidEmailOrPassword:
