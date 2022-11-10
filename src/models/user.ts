@@ -1,10 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
+import validator from 'validator';
 import {
   defaultAbout,
   defaultAvatar,
   defaultName,
-  messageAuthorizationFailed,
+  messageAuthorizationFailed, messageNotValidLink,
   messageUserIdNotFound,
 } from '../constants';
 
@@ -48,6 +49,10 @@ const userSchema = new Schema<IUser, IUserModel>({
   avatar: {
     type: String,
     default: defaultAvatar,
+    validate: {
+      validator: (value: string) => validator.isURL(value, { protocols: ['http', 'https', 'ftp'], require_tld: true, require_protocol: true }),
+      message: messageNotValidLink,
+    },
   },
 });
 userSchema.static('findUserById', function findUserById(id: string) {
