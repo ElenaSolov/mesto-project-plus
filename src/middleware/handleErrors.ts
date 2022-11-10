@@ -3,6 +3,7 @@ import {
   messageNotValidEmailOrPassword,
   messageServerError,
   STATUS_400,
+  STATUS_403,
   STATUS_404,
   STATUS_409,
   STATUS_500,
@@ -39,7 +40,6 @@ export default (err: IError | string, req: Request, res: Response, next: NextFun
     case messageLinkNotProvided:
     case messageNameOrLinkNotProvided:
     case messageCardIdNotProvided:
-    case messageNoRights:
       res.status(STATUS_400).send(makeError(err));
       break;
     case messageUserAlreadyExist:
@@ -52,6 +52,9 @@ export default (err: IError | string, req: Request, res: Response, next: NextFun
     case messageNeedAuthorization:
     case messageAuthorizationFailed:
       res.status(STATUS_401).send(makeError(err));
+      break;
+    case messageNoRights:
+      res.status(STATUS_403).send(makeError(err));
       break;
     default:
       res.status(STATUS_500).send(makeError(messageServerError));
