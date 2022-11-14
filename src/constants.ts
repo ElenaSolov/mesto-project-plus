@@ -38,6 +38,7 @@ export const messageNoRights = 'Нельзя удалять карточки д�
 export const messageAuthorizationFailed = 'Неправильные почта или пароль';
 export const messageNotValidId = 'Не корректный id';
 export const messageNotValidLink = 'Не корректная ссылка';
+export const messageNoContentFound = 'Такой страницы не существует';
 
 export const CAST_ERROR = 'CastError';
 export const VALIDATION_ERROR = 'ValidationError';
