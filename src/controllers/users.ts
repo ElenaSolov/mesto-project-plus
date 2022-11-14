@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
@@ -95,10 +94,7 @@ export const updateUserAvatar = (req: IRequestWithAuth, res: Response, next: Nex
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  if (!email || !validator.isEmail(email) || !password) {
-    next(messageNotValidEmailOrPassword);
-    return;
-  }
+
   User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {

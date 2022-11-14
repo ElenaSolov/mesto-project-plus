@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import {
-  messageCardNotFound,
-  messageNameOrLinkNotProvided, messageNoRights,
+  messageCardNotFound, messageNoRights,
   STATUS_204, messageUserIdNotProvided, STATUS_201, messageNotValidId,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
@@ -19,9 +18,7 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 export const createCard = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
   const ownerId = req.user?._id;
   const { name, link } = req.body;
-  if (!name || !link) {
-    next(messageNameOrLinkNotProvided);
-  }
+
   Card.create({
     name,
     link,
@@ -34,9 +31,9 @@ export const createCard = (req: IRequestWithAuth, res: Response, next: NextFunct
 
 export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const ownerId = req.user?._id;
-  const { id } = req.params;
-  if (!validateIdMongoose(id)) return next(messageNotValidId);
-  Card.findOne({ _id: id })
+  const { cardId } = req.params;
+  if (!validateIdMongoose(cardId)) return next(messageNotValidId);
+  Card.findOne({ _id: cardId })
     .then((card) => {
       if (!card) {
         next(messageCardNotFound);
