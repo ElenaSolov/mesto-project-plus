@@ -1,5 +1,6 @@
 export const uri = 'mongodb+srv://seaver:UMk88Df44p0dGH6c@cluster0.qf2ysmc.mongodb.net/?retryWrites=true&w=majority';
 export const jwtsecret = 'secret';
+export const urlPattern = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
 
 export const defaultName = 'Жак-Ив Кусто';
 export const defaultAbout = 'Исследователь';
@@ -22,9 +23,12 @@ export const messageUserCreated = 'Пользователь успешно со�
 export const messageUserIdNotFound = 'Пользователя с таким id не существует';
 export const messageUserAlreadyExist = 'Имейл уже зарегистрирован';
 export const messageNotValidEmailOrPassword = 'Необходимо предоставить корректные имейл и пароль';
+export const messageNoEmailOrPassword = 'Необходимо предоставить имейл и пароль';
 export const messageNameOrLinkNotProvided = 'Необходимо предоставить имя и ссылку на фотографию';
 export const messageLinkNotProvided = 'Необходимо предоставить ссылку на фотографию';
 export const messageNameOrAboutNotProvided = 'Необходимо предоставить имя и описание';
+export const messageNameNotValid = 'Имя должно содержать от 2 до 30 букв';
+export const messageAboutNotValid = 'Описание должно содержать от 2 до 200 букв';
 export const messageUserIdNotProvided = 'Необходимо предоставить id пользователя';
 export const messageCardIdNotProvided = 'Необходимо предоставить id карточки';
 export const messageCardNotFound = 'Карточка не найдена';

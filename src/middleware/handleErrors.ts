@@ -23,6 +23,7 @@ import { IError } from '../types';
 const makeError = (err: string) => ({ message: err });
 
 export default (err: IError | string, req: Request, res: Response, next: NextFunction) => {
+  console.log(11, err);
   if (typeof err !== 'string') {
     if (err.name === 'MongoServerError' && err.code === 11000) {
       return res.status(STATUS_409).send(messageUserAlreadyExist);

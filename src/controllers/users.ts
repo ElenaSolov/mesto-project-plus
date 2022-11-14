@@ -24,10 +24,6 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!email || !validator.isEmail(email) || !password) {
-    next(messageNotValidEmailOrPassword);
-    return;
-  }
   bcrypt.hash(password, 10)
     .then((hash) => User.init()
       .then(() => User.create({

@@ -1,5 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import { errors } from 'celebrate';
+import validateUserInfo from './validators/validateUserInfo';
+import validateCredentials from './validators/validateCredentials';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import { uri, DEFAULT_PORT } from './constants';
@@ -21,12 +24,13 @@ run().then(() => app.listen(PORT, () => {
 
 app.use(requestLogger);
 app.use(express.json());
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', validateCredentials, validateUserInfo, createUser);
+app.post('/signin', validateCredentials, login);
 app.use(auth as express.RequestHandler);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use(errorLogger);
+app.use(errors());
 app.use(handleErrors);
 
 app.get('/', (req, res) => {
