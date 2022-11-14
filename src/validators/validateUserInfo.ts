@@ -8,8 +8,8 @@ import {
 
 export default celebrate({
   body: Joi.object().keys({
-    name: Joi.string().alphanum().min(2).max(30)
-      .messages({ 'string.alphanum': messageNameNotValid, 'string.min': messageNameNotValid, 'string.max': messageNameNotValid }),
+    name: Joi.string().min(2).max(30)
+      .messages({ 'string.min': messageNameNotValid, 'string.max': messageNameNotValid }),
     avatar: Joi.string().uri().pattern(urlPattern)
       .message(messageNotValidLink),
     about: Joi.string().min(2).max(200)

@@ -6,7 +6,6 @@ import User from '../models/user';
 import {
   messageUserIdNotFound,
   messageServerError,
-  messageNameOrAboutNotProvided, messageLinkNotProvided,
   messageNotValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
   jwtsecret, messageNeedAuthorization, messageUserCreated,
 } from '../constants';
@@ -56,10 +55,7 @@ export const getUserById = (req: Request, res: Response, next: NextFunction) => 
 export const updateUserProfile = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
   const id = req.user?._id;
   const { name, about } = req.body;
-  if (!name && !about) {
-    next(messageNameOrAboutNotProvided);
-    return;
-  }
+
   User.findByIdAndUpdate(id, {
     name,
     about,
@@ -80,12 +76,9 @@ export const updateUserProfile = (req: IRequestWithAuth, res: Response, next: Ne
 export const updateUserAvatar = (req: IRequestWithAuth, res: Response, next: NextFunction) => {
   const id = req.user?._id;
   const { avatar } = req.body;
-  if (!avatar) {
-    next(messageLinkNotProvided);
-    return;
-  }
+
   User.findByIdAndUpdate(id, {
-    avatar: req.body.avatar,
+    avatar,
   }, {
     new: true,
     runValidators: true,
