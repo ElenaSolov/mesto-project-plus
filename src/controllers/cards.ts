@@ -51,6 +51,7 @@ export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction
   const ownerId = req.user?._id;
   if (!ownerId) {
     next(messageUserIdNotProvided);
+    return;
   }
   Card.findByIdAndUpdate(
     cardId,

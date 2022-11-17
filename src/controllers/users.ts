@@ -32,7 +32,10 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         password: hash,
       }))
       .then((user) => {
-        if (!user) next(messageServerError);
+        if (!user) {
+          next(messageServerError);
+          return;
+        }
         res.status(201)
           .send({ message: messageUserCreated, user: user.name, email: user.email });
       }))
