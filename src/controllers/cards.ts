@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import {
-  messageCardNotFound, messageNoRights,
-  STATUS_204, messageUserIdNotProvided, STATUS_201,
+  messageCardNotFound, STATUS_204, messageUserIdNotProvided,
+  STATUS_201, messageServerError, VALIDATION_ERROR, CAST_ERROR,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
+import BadRequestError from '../errors/BadRequestError';
+import NotFoundError from '../errors/NotFoundError';
+import NoRightsError from '../errors/NoRightsError';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -23,9 +26,18 @@ export const createCard = (req: IRequestWithAuth, res: Response, next: NextFunct
     link,
     owner: ownerId,
   })
-    .then((card) => res.status(STATUS_201)
-      .send(card))
-    .catch(next);
+    .then((card) => {
+      if (!card) {
+        next(messageServerError);
+      } else res.status(STATUS_201).send(card);
+    })
+    .catch((err) => {
+      if (err.name === VALIDATION_ERROR) {
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
+      }
+    });
 };
 
 export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
@@ -34,24 +46,29 @@ export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFuncti
   Card.findOne({ _id: id })
     .then((card) => {
       if (!card) {
-        next(messageCardNotFound);
+        throw new NotFoundError(messageCardNotFound);
       } else if (card.owner.toString() !== ownerId) {
-        next(messageNoRights);
+        throw new NoRightsError();
       } else {
         Card.deleteOne({ _id: card.id })
           .then(() => res.status(STATUS_204).send())
           .catch(next);
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === CAST_ERROR) {
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
+      }
+    });
 };
 
 export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const ownerId = req.user?._id;
   if (!ownerId) {
-    next(messageUserIdNotProvided);
-    return;
+    throw new BadRequestError(messageUserIdNotProvided);
   }
   Card.findByIdAndUpdate(
     id,
@@ -60,12 +77,18 @@ export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction
   )
     .then((card) => {
       if (!card) {
-        next(messageCardNotFound);
+        throw new NotFoundError(messageCardNotFound);
       } else {
         res.send({ name: card.name, link: card.link, likes: card.likes });
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === CAST_ERROR) {
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
+      }
+    });
 };
 
 export const dislikeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
@@ -78,10 +101,16 @@ export const dislikeCard = (req:IRequestWithAuth, res: Response, next: NextFunct
     )
     .then((card) => {
       if (!card) {
-        next(messageCardNotFound);
+        throw new NotFoundError(messageCardNotFound);
       } else {
         res.send({ name: card.name, link: card.link, likes: card.likes });
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === CAST_ERROR) {
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
+      }
+    });
 };
