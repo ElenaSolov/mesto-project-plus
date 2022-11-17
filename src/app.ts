@@ -31,15 +31,14 @@ app.post('/signin', validateCredentials, login);
 app.use(auth as express.RequestHandler);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use(errorLogger);
-app.use(errors());
-app.use(handleErrors);
-
 app.use((req, res) => {
   res.status(404).json({
     message: messageNoContentFound,
   });
 });
+app.use(errorLogger);
+app.use(errors());
+app.use(handleErrors);
 
 app.get('/', (req, res) => {
   res.send('Mesto App');
