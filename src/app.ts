@@ -31,10 +31,8 @@ app.post('/signin', validateCredentials, login);
 app.use(auth as express.RequestHandler);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use((req, res) => {
-  res.status(404).json({
-    message: messageNoContentFound,
-  });
+app.use((req, res, next) => {
+  next(messageNoContentFound);
 });
 app.use(errorLogger);
 app.use(errors());

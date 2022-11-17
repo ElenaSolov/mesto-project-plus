@@ -16,7 +16,8 @@ import {
   messageNameOrLinkNotProvided,
   messageNeedAuthorization,
   messageAuthorizationFailed, STATUS_401,
-  messageCardNotFound, messageNoRights, messageNotValidId, messageNotValidLink, CAST_ERROR,
+  messageCardNotFound, messageNoRights, messageNotValidId,
+  messageNotValidLink, CAST_ERROR, messageNoContentFound,
 } from '../constants';
 import { IError } from '../types';
 
@@ -40,6 +41,7 @@ export default (err: IError | string, req: Request, res: Response, next: NextFun
     case messageLinkNotProvided:
     case messageNameOrLinkNotProvided:
     case messageCardIdNotProvided:
+    case messageNoContentFound:
       res.status(STATUS_400).send(makeError(err));
       break;
     case messageUserAlreadyExist:
