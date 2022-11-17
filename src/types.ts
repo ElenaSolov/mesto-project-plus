@@ -10,6 +10,6 @@ export interface IRequestWithAuth extends Request {
 }
 
 export interface IError extends Error {
-  name: string;
-  code?: number;
+  message: string;
+  statusCode?: number;
 }

@@ -1,19 +1,19 @@
 import jwt from 'jsonwebtoken';
 import { NextFunction, Response } from 'express';
-import { jwtsecret, messageNeedAuthorization } from '../constants';
+import { jwtsecret, messageAuthorizationFailed, messageNeedAuthorization } from '../constants';
 import { IRequestWithAuth, IOwner } from '../types';
+import NotAuthorizedError from '../errors/NotAuthorizedError';
 
 export default (req: IRequestWithAuth, res: Response, next: NextFunction) => {
   const { token } = req.cookies;
   if (!token) {
-    next(messageNeedAuthorization);
-    return;
+    throw new NotAuthorizedError(messageNeedAuthorization);
   }
   let payload;
   try {
     payload = jwt.verify(token, jwtsecret);
   } catch {
-    next(messageNeedAuthorization);
+    throw new NotAuthorizedError(messageAuthorizationFailed);
   }
   req.user = payload as IOwner;
   next();

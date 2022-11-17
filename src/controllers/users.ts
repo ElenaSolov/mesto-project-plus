@@ -7,8 +7,12 @@ import {
   messageServerError,
   messageNotValidEmailOrPassword, ONE_WEEK, ONE_WEEK_IN_MS,
   jwtsecret, messageNeedAuthorization, messageUserCreated,
+  VALIDATION_ERROR, messageUserAlreadyExist, CAST_ERROR,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
+import NotFoundError from '../errors/NotFoundError';
+import BadRequestError from '../errors/BadRequestError';
+import UserExistsError from '../errors/UserExistsError';
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
@@ -33,20 +37,25 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       }))
       .then((user) => {
         if (!user) {
-          next(messageServerError);
-          return;
+          throw new Error(messageServerError);
         }
         res.status(201)
           .send({ message: messageUserCreated, user: user.name, email: user.email });
       }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === VALIDATION_ERROR) {
+        next(new BadRequestError(err.message));
+      } else if (err.code === 11000) {
+        next(new UserExistsError(messageUserAlreadyExist));
+      } else next(err);
+    });
 };
 
 export const getUserById = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   User.findUserById(id).then((user) => {
     if (!user) {
-      next(messageUserIdNotFound);
+      throw new NotFoundError(messageUserIdNotFound);
     } else {
       res.send(user);
     }
@@ -67,7 +76,7 @@ export const updateUserProfile = (req: IRequestWithAuth, res: Response, next: Ne
   }).exec()
     .then((user) => {
       if (!user) {
-        next(messageUserIdNotFound);
+        throw new NotFoundError(messageUserIdNotFound);
       } else {
         res.send(user);
       }
@@ -87,7 +96,7 @@ export const updateUserAvatar = (req: IRequestWithAuth, res: Response, next: Nex
   }).exec()
     .then((user) => {
       if (!user) {
-        next(messageUserIdNotFound);
+        throw new NotFoundError(messageUserIdNotFound);
       } else {
         res.send(user);
       }
@@ -101,7 +110,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        next(messageNotValidEmailOrPassword);
+        throw new BadRequestError(messageNotValidEmailOrPassword);
       } else {
         const token = jwt.sign({ _id: user._id }, jwtsecret, { expiresIn: ONE_WEEK });
         res.cookie('token', token, {
@@ -118,12 +127,21 @@ export const getUserInfo = (req: IRequestWithAuth, res: Response, next: NextFunc
     User.findUserById(owner._id)
       .then((user) => {
         if (!user) {
-          next(messageNotValidEmailOrPassword);
+          throw new BadRequestError(messageNotValidEmailOrPassword);
         } else {
           res.send(user);
         }
       })
-      .catch(next);
+      .catch((err) => {
+        if (err.name === CAST_ERROR) {
+          next(new NotFoundError(messageUserIdNotFound));
+        }
+        if (err.name === VALIDATION_ERROR) {
+          next(new BadRequestError(err.message));
+        } else {
+          next(err);
+        }
+      });
   } else {
     next(messageNeedAuthorization);
   }
