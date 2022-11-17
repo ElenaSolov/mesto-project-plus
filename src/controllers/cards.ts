@@ -30,8 +30,8 @@ export const createCard = (req: IRequestWithAuth, res: Response, next: NextFunct
 
 export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const ownerId = req.user?._id;
-  const { cardId } = req.params;
-  Card.findOne({ _id: cardId })
+  const { id } = req.params;
+  Card.findOne({ _id: id })
     .then((card) => {
       if (!card) {
         next(messageCardNotFound);
@@ -47,14 +47,14 @@ export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFuncti
 };
 
 export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
-  const { cardId } = req.params;
+  const { id } = req.params;
   const ownerId = req.user?._id;
   if (!ownerId) {
     next(messageUserIdNotProvided);
     return;
   }
   Card.findByIdAndUpdate(
-    cardId,
+    id,
     { $addToSet: { likes: ownerId } }, // добавить _id в массив, если его там нет
     { new: true, runValidators: true },
   )
@@ -69,10 +69,10 @@ export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction
 };
 
 export const dislikeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
-  const { cardId } = req.params;
+  const { id } = req.params;
   Card
     .findByIdAndUpdate(
-      cardId,
+      id,
       { $pull: { likes: req.user?._id } },
       { new: true, runValidators: true },
     )

@@ -3,10 +3,10 @@ import { messageNotValidId } from '../constants';
 
 export default celebrate({
   params: {
-    id: Joi.string().alphanum().length(24).required()
+    id: Joi.string().hex().length(24).required()
       .messages({
         'string.required': messageNotValidId,
-        'string.alphanum': messageNotValidId,
+        'string.hex': messageNotValidId,
         'string.length': messageNotValidId,
       }),
   },
