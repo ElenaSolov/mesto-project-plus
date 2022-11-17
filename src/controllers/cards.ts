@@ -2,10 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import {
   messageCardNotFound, messageNoRights,
-  STATUS_204, messageUserIdNotProvided, STATUS_201, messageNotValidId,
+  STATUS_204, messageUserIdNotProvided, STATUS_201,
 } from '../constants';
 import { IRequestWithAuth } from '../types';
-import { validateIdMongoose } from '../validators/validateId';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -32,7 +31,6 @@ export const createCard = (req: IRequestWithAuth, res: Response, next: NextFunct
 export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const ownerId = req.user?._id;
   const { cardId } = req.params;
-  if (!validateIdMongoose(cardId)) return next(messageNotValidId);
   Card.findOne({ _id: cardId })
     .then((card) => {
       if (!card) {
@@ -50,7 +48,6 @@ export const deleteCard = (req:IRequestWithAuth, res: Response, next: NextFuncti
 
 export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  if (!validateIdMongoose(cardId)) return next(messageNotValidId);
   const ownerId = req.user?._id;
   if (!ownerId) {
     next(messageUserIdNotProvided);
@@ -72,7 +69,6 @@ export const likeCard = (req:IRequestWithAuth, res: Response, next: NextFunction
 
 export const dislikeCard = (req:IRequestWithAuth, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  if (!validateIdMongoose(cardId)) return next(messageNotValidId);
   Card
     .findByIdAndUpdate(
       cardId,
