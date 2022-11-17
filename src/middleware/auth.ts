@@ -4,12 +4,11 @@ import { jwtsecret, messageNeedAuthorization } from '../constants';
 import { IRequestWithAuth, IOwner } from '../types';
 
 export default (req: IRequestWithAuth, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  const { token } = req.cookies;
+  if (!token) {
     next(messageNeedAuthorization);
     return;
   }
-  const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, jwtsecret);

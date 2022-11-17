@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 import { errors } from 'celebrate';
 import validateUserInfo from './validators/validateUserInfo';
 import validateCredentials from './validators/validateCredentials';
@@ -23,6 +24,7 @@ run().then(() => app.listen(PORT, () => {
   .catch((err) => console.log(err));
 
 app.use(requestLogger);
+app.use(cookieParser());
 app.use(express.json());
 app.post('/signup', validateCredentials, validateUserInfo, createUser);
 app.post('/signin', validateCredentials, login);
