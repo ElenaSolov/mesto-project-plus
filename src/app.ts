@@ -11,6 +11,7 @@ import { createUser, login } from './controllers/users';
 import auth from './middleware/auth';
 import { requestLogger, errorLogger } from './middleware/logger';
 import handleErrors from './middleware/handleErrors';
+import NotFoundError from './errors/NotFoundError';
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
@@ -32,7 +33,7 @@ app.use(auth as express.RequestHandler);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use((req, res, next) => {
-  next(messageNoContentFound);
+  next(new NotFoundError(messageNoContentFound));
 });
 app.use(errorLogger);
 app.use(errors());
