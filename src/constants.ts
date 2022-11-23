@@ -1,5 +1,6 @@
-export const uri = 'mongodb+srv://seaver:UMk88Df44p0dGH6c@cluster0.qf2ysmc.mongodb.net/?retryWrites=true&w=majority';
-export const jwtsecret = 'secret';
+export const jwtsecret = process.env.JWTSECRET || 'default_secret';
+export const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/?retryWrites=true&w=majority`;
+
 export const urlPattern = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_+.~#?&/=]*$/;
 
 export const defaultName = 'Жак-Ив Кусто';
@@ -26,11 +27,9 @@ export const messageNotValidEmailOrPassword = 'Необходимо предос
 export const messageNoEmailOrPassword = 'Необходимо предоставить имейл и пароль';
 export const messageNameOrLinkNotProvided = 'Необходимо предоставить имя и ссылку на фотографию';
 export const messageLinkNotProvided = 'Необходимо предоставить ссылку на фотографию';
-export const messageNameOrAboutNotProvided = 'Необходимо предоставить имя и описание';
 export const messageNameNotValid = 'Имя должно содержать от 2 до 30 букв';
 export const messageAboutNotValid = 'Описание должно содержать от 2 до 200 букв';
 export const messageUserIdNotProvided = 'Необходимо предоставить id пользователя';
-export const messageCardIdNotProvided = 'Необходимо предоставить id карточки';
 export const messageCardNotFound = 'Карточка не найдена';
 export const messageServerError = 'Ошибка сервера';
 export const messageNeedAuthorization = 'Необходима авторизация';

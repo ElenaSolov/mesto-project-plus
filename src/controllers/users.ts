@@ -112,10 +112,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       if (!user) {
         throw new BadRequestError(messageNotValidEmailOrPassword);
       } else {
-        const token = jwt.sign({ _id: user._id }, jwtsecret, { expiresIn: ONE_WEEK });
+        const token = jwt.sign({ _id: user._id }, jwtsecret as string, { expiresIn: ONE_WEEK });
         res.cookie('token', token, {
           httpOnly: true,
           maxAge: ONE_WEEK_IN_MS,
+          sameSite: true,
         }).send({ token });
       }
     })

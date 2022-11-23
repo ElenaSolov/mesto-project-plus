@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
@@ -15,7 +16,6 @@ import NotFoundError from './errors/NotFoundError';
 
 const { PORT = DEFAULT_PORT } = process.env;
 const app = express();
-
 async function run() {
   await mongoose.connect(uri);
 }
