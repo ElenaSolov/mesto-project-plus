@@ -22,6 +22,6 @@ Server side for Instagram-like single page website (Mesto), with authentication,
 
 ## Future plans:
 
-- to connect to frontend and deploy
+- to connect to frontend
 - add tests
 
